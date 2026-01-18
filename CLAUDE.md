@@ -6,6 +6,7 @@ This repository contains classic QBasic programs from the DOS era and their mode
 
 - `/` - Original QBasic .BAS files
 - `/SpinHouse/` - VB.Net Windows Forms port of SPINHOUS.BAS
+- `/Editor3D/` - VB.Net Windows Forms port of EDITOR.BAS
 
 ## Original QBasic Programs
 
@@ -15,15 +16,60 @@ This repository contains classic QBasic programs from the DOS era and their mode
 | SNAKES.BAS | Classic snake game |
 | SPINHOUS.BAS | Spinning 3D wireframe house visualization |
 
-## Building
+## VB.Net Projects
 
-The VB.Net projects target .NET 7.0 on Windows:
+### SpinHouse
+
+Spinning 3D wireframe house visualization.
 
 ```bash
 cd SpinHouse
 dotnet build
 dotnet run
 ```
+
+**Controls:**
+- `Z` - Rotate left
+- `X` - Rotate right
+- `Space` - Stop rotation
+- `K` - Move house away
+- `M` - Move house closer
+- `Q` / `Escape` - Quit
+
+### Editor3D
+
+Full 3D scene editor with camera controls, object management, and file I/O.
+
+```bash
+cd Editor3D
+dotnet build
+dotnet run
+```
+
+**Movement (Numpad):**
+- `8` / `2` - Move forward / backward
+- `4` / `6` - Strafe left / right
+- `9` / `3` - Move up / down
+- `5` - Reset camera position
+
+**Rotation:**
+- `<` / `>` - Turn left / right
+- `'` / `/` - Look up / down
+- `O` / `P` - Roll left / right
+
+**Editor Functions:**
+- `L` - Cycle object highlight
+- `T` - List all objects
+- `M` - Move selected object
+- `D` - Delete selected object
+- `C` - Change movement speed
+- `S` - Save world
+- `H` - Show help
+- `Q` / `Escape` - Quit
+
+**File Formats:**
+- `.wld` - World files (entire scene)
+- `.obj` - Individual object files
 
 ## Conversion Notes
 
