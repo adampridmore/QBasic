@@ -2,6 +2,10 @@ Imports System.Windows.Forms
 Imports System.Drawing
 
 Namespace Editor3D
+    ''' <summary>
+    ''' Main form for the 3D Editor application
+    ''' Ported from EDITOR.BAS main program loop (lines 256-298)
+    ''' </summary>
     Public Class MainForm
         Inherits Form
 
@@ -15,7 +19,7 @@ Namespace Editor3D
         Private BackBuffer As Bitmap
         Private BackGraphics As Graphics
 
-        ' Editor state
+        ' EDITOR.BAS:57 - col = 9 (default highlight colour)
         Private HighlightedObject As Integer = -1
         Private HighlightColor As Integer = 9 ' Blue
 
@@ -31,18 +35,19 @@ Namespace Editor3D
 
         Private Sub InitializeComponent()
             Me.Text = "3D Editor - VB.Net Port of EDITOR.BAS"
+            ' EDITOR.BAS:27 - SCREEN 7 (320x200), scaled up for modern displays
             Me.ClientSize = New Size(800, 600)
             Me.DoubleBuffered = True
             Me.BackColor = Color.Black
             Me.KeyPreview = True
             Me.StartPosition = FormStartPosition.CenterScreen
 
-            ' Create menu strip
+            ' Create menu strip (replaces EDITOR.BAS text menus)
             MenuStrip = New MenuStrip()
             MenuStrip.BackColor = Color.FromArgb(40, 40, 40)
             MenuStrip.ForeColor = Color.White
 
-            ' File menu
+            ' File menu - EDITOR.BAS:312-518 save: subroutine
             Dim fileMenu As New ToolStripMenuItem("&File")
             fileMenu.DropDownItems.Add("&Save World...", Nothing, AddressOf SaveWorld_Click)
             fileMenu.DropDownItems.Add("&Load World...", Nothing, AddressOf LoadWorld_Click)
@@ -52,7 +57,7 @@ Namespace Editor3D
             fileMenu.DropDownItems.Add("E&xit", Nothing, Sub() Me.Close())
             MenuStrip.Items.Add(fileMenu)
 
-            ' Edit menu
+            ' Edit menu - EDITOR.BAS:526-742 manage: subroutine
             Dim editMenu As New ToolStripMenuItem("&Edit")
             editMenu.DropDownItems.Add("&Copy Object", Nothing, AddressOf CopyObject_Click)
             editMenu.DropDownItems.Add("&Delete Object", Nothing, AddressOf DeleteObject_Click)
@@ -67,7 +72,7 @@ Namespace Editor3D
             viewMenu.DropDownItems.Add("Change &Speed...", Nothing, AddressOf ChangeSpeed_Click)
             MenuStrip.Items.Add(viewMenu)
 
-            ' Help menu
+            ' Help menu - EDITOR.BAS:831-859 help: subroutine
             Dim helpMenu As New ToolStripMenuItem("&Help")
             helpMenu.DropDownItems.Add("&Controls", Nothing, AddressOf ShowHelp_Click)
             helpMenu.DropDownItems.Add("&About", Nothing, AddressOf ShowAbout_Click)
@@ -76,7 +81,7 @@ Namespace Editor3D
             Me.MainMenuStrip = MenuStrip
             Me.Controls.Add(MenuStrip)
 
-            ' Status label
+            ' Status label (replaces EDITOR.BAS:270-273 LOCATE/PRINT statements)
             StatusLabel = New Label()
             StatusLabel.Dock = DockStyle.Bottom
             StatusLabel.Height = 24
@@ -86,7 +91,6 @@ Namespace Editor3D
             StatusLabel.Text = "Ready - Press H for help"
             Me.Controls.Add(StatusLabel)
 
-            ' Events
             AddHandler Me.KeyDown, AddressOf MainForm_KeyDown
             AddHandler Me.Paint, AddressOf MainForm_Paint
             AddHandler Me.Resize, AddressOf MainForm_Resize
@@ -102,6 +106,7 @@ Namespace Editor3D
         Private Sub InitializeRendering()
             CreateBackBuffer()
 
+            ' Replaces EDITOR.BAS:276-278 - WHILE button$ = "" / WEND polling loop
             RenderTimer = New Timer()
             RenderTimer.Interval = 16 ' ~60 FPS
             AddHandler RenderTimer.Tick, AddressOf RenderTimer_Tick
@@ -126,6 +131,9 @@ Namespace Editor3D
             Return New Rectangle(0, top, Me.ClientSize.Width, Me.ClientSize.Height - top - bottom)
         End Function
 
+        ''' <summary>
+        ''' Main loop tick - corresponds to EDITOR.BAS:259-290
+        ''' </summary>
         Private Sub RenderTimer_Tick(sender As Object, e As EventArgs)
             UpdateStatus()
             Me.Invalidate()
@@ -139,21 +147,23 @@ Namespace Editor3D
             StatusLabel.Text = $"Pos: ({Camera.PosX:F1}, {Camera.PosY:F1}, {Camera.PosZ:F1}) | Speed: {Camera.Speed}{objInfo}"
         End Sub
 
+        ''' <summary>
+        ''' Paint handler - corresponds to EDITOR.BAS:261-268 display code
+        ''' </summary>
         Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs)
             If BackBuffer Is Nothing OrElse BackGraphics Is Nothing Then Return
 
             Dim renderArea = GetClientRenderArea()
 
-            ' Clear
+            ' EDITOR.BAS:261 - CLS
             BackGraphics.Clear(Color.Black)
 
-            ' Render 3D scene
+            ' EDITOR.BAS:268 - GOSUB disp
             Renderer.Render(BackGraphics, renderArea.Width, renderArea.Height, HighlightedObject, HighlightColor)
 
-            ' Draw help overlay
+            ' Draw help overlay (not in original)
             DrawHelpOverlay(BackGraphics)
 
-            ' Copy to screen
             e.Graphics.DrawImage(BackBuffer, renderArea.X, renderArea.Y)
         End Sub
 
@@ -170,60 +180,68 @@ Namespace Editor3D
             End Using
         End Sub
 
+        ''' <summary>
+        ''' Key handler - corresponds to EDITOR.BAS:280-289 and movement: subroutine (917-958)
+        ''' EDITOR.BAS used: button$ = INKEY$
+        ''' </summary>
         Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs)
             Select Case e.KeyCode
-                ' Movement (numpad)
+                ' EDITOR.BAS:917-958 - movement: subroutine
+                ' Movement (numpad) - EDITOR.BAS:919-939
                 Case Keys.NumPad8
-                    Camera.MoveForward()
+                    Camera.MoveForward()   ' EDITOR.BAS:929-933
                 Case Keys.NumPad2
-                    Camera.MoveBackward()
+                    Camera.MoveBackward()  ' EDITOR.BAS:935-939
                 Case Keys.NumPad4
-                    Camera.StrafeLeft()
+                    Camera.StrafeLeft()    ' EDITOR.BAS:921-924
                 Case Keys.NumPad6
-                    Camera.StrafeRight()
+                    Camera.StrafeRight()   ' EDITOR.BAS:925-928
                 Case Keys.NumPad9
-                    Camera.MoveUp()
+                    Camera.MoveUp()        ' EDITOR.BAS:919
                 Case Keys.NumPad3
-                    Camera.MoveDown()
+                    Camera.MoveDown()      ' EDITOR.BAS:920
                 Case Keys.NumPad5
-                    Camera.Reset()
+                    Camera.Reset()         ' EDITOR.BAS:941-948
 
-                ' Rotation
-                Case Keys.Oemcomma  ' <
+                ' Rotation - EDITOR.BAS:951-957
+                Case Keys.Oemcomma         ' < - EDITOR.BAS:951
                     Camera.TurnLeft()
-                Case Keys.OemPeriod ' >
+                Case Keys.OemPeriod        ' > - EDITOR.BAS:952
                     Camera.TurnRight()
-                Case Keys.Oem2      ' /
+                Case Keys.Oem2             ' / - EDITOR.BAS:953
                     Camera.LookDown()
-                Case Keys.Oem7      ' '
+                Case Keys.Oem7             ' ' - EDITOR.BAS:954
                     Camera.LookUp()
-                Case Keys.O
+                Case Keys.O                ' EDITOR.BAS:957
                     Camera.RollLeft()
-                Case Keys.P
+                Case Keys.P                ' EDITOR.BAS:956
                     Camera.RollRight()
 
-                ' Editor functions
-                Case Keys.L
+                ' Editor functions - EDITOR.BAS:282-289
+                Case Keys.L                ' EDITOR.BAS:286 - IF button$ = "l" THEN GOSUB highlight
                     HighlightMode_Click(Nothing, Nothing)
-                Case Keys.T
+                Case Keys.T                ' EDITOR.BAS:282 - IF button$ = "t" THEN GOSUB listobjects
                     ListObjects_Click(Nothing, Nothing)
-                Case Keys.H
+                Case Keys.H                ' EDITOR.BAS:284 - IF button$ = "h" THEN GOSUB help
                     ShowHelp_Click(Nothing, Nothing)
-                Case Keys.M
+                Case Keys.M                ' EDITOR.BAS:285 - IF button$ = "m" THEN GOSUB moveobject
                     MoveObject_Click(Nothing, Nothing)
-                Case Keys.C
+                Case Keys.C                ' EDITOR.BAS:287 - IF button$ = "c" THEN GOSUB speedchange
                     ChangeSpeed_Click(Nothing, Nothing)
-                Case Keys.D
+                Case Keys.D                ' EDITOR.BAS:288 - IF button$ = "d" THEN GOSUB manage
                     DeleteObject_Click(Nothing, Nothing)
-                Case Keys.S
+                Case Keys.S                ' EDITOR.BAS:289 - IF button$ = "s" THEN GOSUB save
                     SaveWorld_Click(Nothing, Nothing)
 
+                ' EDITOR.BAS:260 - WHILE NOT (button$ = "Q")
                 Case Keys.Q, Keys.Escape
                     Me.Close()
             End Select
         End Sub
 
-        ' Menu handlers
+        ''' <summary>
+        ''' Save world - EDITOR.BAS:324-373
+        ''' </summary>
         Private Sub SaveWorld_Click(sender As Object, e As EventArgs)
             Using dlg As New SaveFileDialog()
                 dlg.Filter = "World Files (*.wld)|*.wld"
@@ -235,6 +253,9 @@ Namespace Editor3D
             End Using
         End Sub
 
+        ''' <summary>
+        ''' Load world - EDITOR.BAS:376-447
+        ''' </summary>
         Private Sub LoadWorld_Click(sender As Object, e As EventArgs)
             Using dlg As New OpenFileDialog()
                 dlg.Filter = "World Files (*.wld)|*.wld"
@@ -249,6 +270,9 @@ Namespace Editor3D
             End Using
         End Sub
 
+        ''' <summary>
+        ''' Save object - EDITOR.BAS:450-496
+        ''' </summary>
         Private Sub SaveObject_Click(sender As Object, e As EventArgs)
             If HighlightedObject < 0 Then
                 MessageBox.Show("Please select an object first (use Highlight mode).", "Save Object", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -266,6 +290,9 @@ Namespace Editor3D
             End Using
         End Sub
 
+        ''' <summary>
+        ''' Copy object - EDITOR.BAS:689-711
+        ''' </summary>
         Private Sub CopyObject_Click(sender As Object, e As EventArgs)
             If HighlightedObject < 0 Then
                 MessageBox.Show("Please select an object first (use Highlight mode).", "Copy Object", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -280,6 +307,9 @@ Namespace Editor3D
             End If
         End Sub
 
+        ''' <summary>
+        ''' Delete object - EDITOR.BAS:562-683
+        ''' </summary>
         Private Sub DeleteObject_Click(sender As Object, e As EventArgs)
             If HighlightedObject < 0 Then
                 MessageBox.Show("Please select an object first (use Highlight mode).", "Delete Object", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -293,12 +323,16 @@ Namespace Editor3D
             End If
         End Sub
 
+        ''' <summary>
+        ''' Move object - EDITOR.BAS:801-827 moveobject: subroutine
+        ''' </summary>
         Private Sub MoveObject_Click(sender As Object, e As EventArgs)
             If HighlightedObject < 0 Then
                 MessageBox.Show("Please select an object first (use Highlight mode).", "Move Object", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 Return
             End If
 
+            ' EDITOR.BAS:803-808 - Display current position
             Dim obj = World.Objects(HighlightedObject)
             Dim input = InputBox($"Move '{obj.Name}'" & vbCrLf &
                                  $"Current: X={obj.PosX}, Y={obj.PosY}, Z={obj.PosZ}" & vbCrLf &
@@ -307,6 +341,7 @@ Namespace Editor3D
                 Try
                     Dim parts = input.Split(","c)
                     If parts.Length >= 3 Then
+                        ' EDITOR.BAS:814-816
                         Dim dx = Single.Parse(parts(0).Trim())
                         Dim dy = Single.Parse(parts(1).Trim())
                         Dim dz = Single.Parse(parts(2).Trim())
@@ -318,11 +353,15 @@ Namespace Editor3D
             End If
         End Sub
 
+        ''' <summary>
+        ''' List objects - EDITOR.BAS:868-898 listobjects: subroutine
+        ''' </summary>
         Private Sub ListObjects_Click(sender As Object, e As EventArgs)
             Dim list As New System.Text.StringBuilder()
             list.AppendLine("Objects in world:")
             list.AppendLine()
 
+            ' EDITOR.BAS:877-884 - Display object info
             For i = 0 To World3D.MaxObjects - 1
                 Dim obj = World.Objects(i)
                 If obj.IsUsed Then
@@ -336,8 +375,12 @@ Namespace Editor3D
             MessageBox.Show(list.ToString(), "Object List", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End Sub
 
+        ''' <summary>
+        ''' Highlight mode - EDITOR.BAS:761-794 highlight: subroutine
+        ''' Cycles through objects with <> keys in original
+        ''' </summary>
         Private Sub HighlightMode_Click(sender As Object, e As EventArgs)
-            ' Cycle through objects
+            ' EDITOR.BAS:781-782 - Cycle through objects
             Dim startIndex = If(HighlightedObject < 0, 0, HighlightedObject + 1)
 
             For i = startIndex To World3D.MaxObjects - 1
@@ -362,7 +405,11 @@ Namespace Editor3D
             Camera.Reset()
         End Sub
 
+        ''' <summary>
+        ''' Change speed - EDITOR.BAS:748-756 speedchange: subroutine
+        ''' </summary>
         Private Sub ChangeSpeed_Click(sender As Object, e As EventArgs)
+            ' EDITOR.BAS:751-753
             Dim input = InputBox($"Current speed: {Camera.Speed}" & vbCrLf & "Enter new speed:", "Change Speed", Camera.Speed.ToString())
             If Not String.IsNullOrEmpty(input) Then
                 Try
@@ -372,7 +419,11 @@ Namespace Editor3D
             End If
         End Sub
 
+        ''' <summary>
+        ''' Show help - EDITOR.BAS:831-859 help: subroutine
+        ''' </summary>
         Private Sub ShowHelp_Click(sender As Object, e As EventArgs)
+            ' EDITOR.BAS:838-853 - Help text
             Dim help = "3D Editor Controls:" & vbCrLf & vbCrLf &
                        "MOVEMENT (Numpad):" & vbCrLf &
                        "  8 - Move forward" & vbCrLf &

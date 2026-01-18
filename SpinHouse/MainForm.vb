@@ -2,6 +2,10 @@ Imports System.Windows.Forms
 Imports System.Drawing
 
 Namespace SpinHouse
+    ''' <summary>
+    ''' Main form for the Spinning House application
+    ''' Ported from SPINHOUS.BAS main loop (lines 180-236)
+    ''' </summary>
     Public Class MainForm
         Inherits Form
 
@@ -17,13 +21,13 @@ Namespace SpinHouse
 
         Private Sub InitializeComponent()
             Me.Text = "Spinning House - VB.Net Port of SPINHOUS.BAS"
+            ' SPINHOUS.BAS:4 - SCREEN 1 (320x200), scaled up for modern displays
             Me.ClientSize = New Size(640, 480)
             Me.DoubleBuffered = True
             Me.BackColor = Color.Black
             Me.KeyPreview = True
             Me.StartPosition = FormStartPosition.CenterScreen
 
-            ' Set up form events
             AddHandler Me.KeyDown, AddressOf MainForm_KeyDown
             AddHandler Me.KeyUp, AddressOf MainForm_KeyUp
             AddHandler Me.Paint, AddressOf MainForm_Paint
@@ -33,11 +37,10 @@ Namespace SpinHouse
 
         Private Sub InitializeRendering()
             House = New House3D()
-
-            ' Create back buffer for smooth rendering
             CreateBackBuffer()
 
-            ' Set up animation timer (~60 FPS)
+            ' SPINHOUS.BAS:182 - FOR lop = 1 TO 1000: NEXT lop (delay loop)
+            ' Replaced with Timer for smooth ~60 FPS animation
             RenderTimer = New Timer()
             RenderTimer.Interval = 16
             AddHandler RenderTimer.Tick, AddressOf RenderTimer_Tick
@@ -59,21 +62,24 @@ Namespace SpinHouse
             End If
         End Sub
 
+        ''' <summary>
+        ''' Animation tick - corresponds to SPINHOUS.BAS:180-236 main WHILE loop
+        ''' </summary>
         Private Sub RenderTimer_Tick(sender As Object, e As EventArgs)
-            ' Update house rotation
             House.Update()
-
-            ' Request repaint
             Me.Invalidate()
         End Sub
 
+        ''' <summary>
+        ''' Paint handler - corresponds to SPINHOUS.BAS:183-202 rendering code
+        ''' </summary>
         Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs)
             If BackBuffer Is Nothing OrElse BackGraphics Is Nothing Then Return
 
-            ' Clear back buffer
+            ' SPINHOUS.BAS:183 - CLS
             BackGraphics.Clear(Color.Black)
 
-            ' Draw controls help text
+            ' Help text (not in original - added for usability)
             Using font As New Font("Consolas", 10)
                 Using brush As New SolidBrush(Color.White)
                     BackGraphics.DrawString("Controls:", font, brush, 10, 10)
@@ -86,35 +92,41 @@ Namespace SpinHouse
                 End Using
             End Using
 
-            ' Render the 3D house
+            ' SPINHOUS.BAS:185-202 - Render the 3D house
             House.Render(BackGraphics, Me.ClientSize.Width, Me.ClientSize.Height)
 
-            ' Copy back buffer to screen
             e.Graphics.DrawImage(BackBuffer, 0, 0)
         End Sub
 
+        ''' <summary>
+        ''' Key handler - corresponds to SPINHOUS.BAS:181, 208-231
+        ''' SPINHOUS.BAS used: button$ = INKEY$
+        ''' </summary>
         Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs)
             Select Case e.KeyCode
+                ' SPINHOUS.BAS:208 - IF button$ = "z" THEN dir = -1
                 Case Keys.Z
                     House.RotationDirection = -1
+                ' SPINHOUS.BAS:209 - IF button$ = "x" THEN dir = 1
                 Case Keys.X
                     House.RotationDirection = 1
+                ' SPINHOUS.BAS:210 - IF button$ = " " THEN dir = 0
                 Case Keys.Space
                     House.RotationDirection = 0
+                ' SPINHOUS.BAS:221-225 - IF button$ = "k" THEN move away
                 Case Keys.K
                     House.MoveY(0.1F)
+                ' SPINHOUS.BAS:227-230 - IF button$ = "m" THEN move closer
                 Case Keys.M
                     House.MoveY(-0.1F)
+                ' SPINHOUS.BAS:180 - WHILE NOT (button$ = "q")
                 Case Keys.Q, Keys.Escape
                     Me.Close()
             End Select
         End Sub
 
         Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs)
-            ' Optional: stop rotation on key release (uncomment if desired)
-            ' If e.KeyCode = Keys.Z OrElse e.KeyCode = Keys.X Then
-            '     House.RotationDirection = 0
-            ' End If
+            ' Original QBasic kept rotating until Space was pressed
         End Sub
 
         Private Sub MainForm_Resize(sender As Object, e As EventArgs)
