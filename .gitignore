@@ -1,0 +1,44 @@
+# Claude Code
+.claude/
+
+# Build results
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+
+# .NET
+*.dll
+*.exe
+*.pdb
+*.cache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Visual Studio
+.vs/
+*.vsidx
+*.lock.json
+
+# JetBrains Rider
+.idea/
+
+# User-specific files
+*.rsuser
+*.sln.docstates
+
+# Build logs
+*.log
+msbuild*.log
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
