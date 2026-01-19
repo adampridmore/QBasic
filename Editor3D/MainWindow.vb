@@ -212,20 +212,20 @@ Namespace Editor3D
 
             Select Case e.Key
                 ' EDITOR.BAS:917-958 - movement: subroutine
-                ' Movement (numpad) - EDITOR.BAS:919-939
-                Case Key.NumPad8
+                ' Movement (numpad or number keys) - EDITOR.BAS:919-939
+                Case Key.NumPad8, Key.D8
                     Camera.MoveForward()   ' EDITOR.BAS:929-933
-                Case Key.NumPad2
+                Case Key.NumPad2, Key.D2
                     Camera.MoveBackward()  ' EDITOR.BAS:935-939
-                Case Key.NumPad4
+                Case Key.NumPad4, Key.D4
                     Camera.StrafeLeft()    ' EDITOR.BAS:921-924
-                Case Key.NumPad6
+                Case Key.NumPad6, Key.D6
                     Camera.StrafeRight()   ' EDITOR.BAS:925-928
-                Case Key.NumPad9
+                Case Key.NumPad9, Key.D9
                     Camera.MoveUp()        ' EDITOR.BAS:919
-                Case Key.NumPad3
+                Case Key.NumPad3, Key.D3
                     Camera.MoveDown()      ' EDITOR.BAS:920
-                Case Key.NumPad5
+                Case Key.NumPad5, Key.D5
                     Camera.Reset()         ' EDITOR.BAS:941-948
 
                 ' Rotation - EDITOR.BAS:951-957
