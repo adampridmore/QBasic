@@ -1,4 +1,3 @@
-Imports System.Drawing
 Imports System.IO
 
 Namespace Editor3D

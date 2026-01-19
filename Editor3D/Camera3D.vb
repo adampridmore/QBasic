@@ -1,5 +1,3 @@
-Imports System.Drawing
-
 Namespace Editor3D
     ''' <summary>
     ''' 3D Camera with position and rotation

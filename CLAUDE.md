@@ -6,7 +6,7 @@ This repository contains classic QBasic programs from the DOS era and their mode
 
 - `/` - Original QBasic .BAS files
 - `/SpinHouse/` - VB.Net Avalonia port of SPINHOUS.BAS (cross-platform)
-- `/Editor3D/` - VB.Net Windows Forms port of EDITOR.BAS (Windows only)
+- `/Editor3D/` - VB.Net Avalonia port of EDITOR.BAS (cross-platform)
 
 ## Original QBasic Programs
 
@@ -36,9 +36,9 @@ dotnet run
 - `M` - Move house closer
 - `Q` / `Escape` - Quit
 
-### Editor3D
+### Editor3D (Cross-platform - Avalonia)
 
-Full 3D scene editor with camera controls, object management, and file I/O.
+Full 3D scene editor with camera controls, object management, and file I/O. Uses [Avalonia UI](https://avaloniaui.net/) for cross-platform support.
 
 ```bash
 cd Editor3D

@@ -1,4 +1,5 @@
-Imports System.Drawing
+Imports Avalonia
+Imports Avalonia.Media
 
 Namespace Editor3D
     ''' <summary>
@@ -9,26 +10,26 @@ Namespace Editor3D
         Private World As World3D
         Private Camera As Camera3D
 
-        ' QBasic color palette mapping to .NET colors
+        ' QBasic color palette mapping to Avalonia colors
         ' EDITOR.BAS used COLOR statement with indices 0-15
         ' SCREEN 7 supported 16 colors from the EGA palette
         Private Shared ReadOnly ColorPalette() As Color = {
-            Color.Black,        ' 0
-            Color.DarkBlue,     ' 1
-            Color.DarkGreen,    ' 2 - used for trees
-            Color.DarkCyan,     ' 3
-            Color.DarkRed,      ' 4
-            Color.DarkMagenta,  ' 5
-            Color.Olive,        ' 6
-            Color.LightGray,    ' 7 - used for house
-            Color.DarkGray,     ' 8
-            Color.Blue,         ' 9 - default highlight color (EDITOR.BAS:57 - col = 9)
-            Color.Lime,         ' 10
-            Color.Cyan,         ' 11
-            Color.Red,          ' 12
-            Color.Magenta,      ' 13
-            Color.Yellow,       ' 14 - used for ground
-            Color.White         ' 15
+            Colors.Black,        ' 0
+            Colors.DarkBlue,     ' 1
+            Colors.DarkGreen,    ' 2 - used for trees
+            Colors.DarkCyan,     ' 3
+            Colors.DarkRed,      ' 4
+            Colors.DarkMagenta,  ' 5
+            Colors.Olive,        ' 6
+            Colors.LightGray,    ' 7 - used for house
+            Colors.DarkGray,     ' 8
+            Colors.Blue,         ' 9 - default highlight color (EDITOR.BAS:57 - col = 9)
+            Colors.Lime,         ' 10
+            Colors.Cyan,         ' 11
+            Colors.Red,          ' 12
+            Colors.Magenta,      ' 13
+            Colors.Yellow,       ' 14 - used for ground
+            Colors.White         ' 15
         }
 
         Public Sub New(world As World3D, camera As Camera3D)
@@ -37,20 +38,20 @@ Namespace Editor3D
         End Sub
 
         ''' <summary>
-        ''' Get .NET color from QBasic color index
+        ''' Get Avalonia color from QBasic color index
         ''' </summary>
         Public Shared Function GetColor(index As Integer) As Color
             If index >= 0 AndAlso index < ColorPalette.Length Then
                 Return ColorPalette(index)
             End If
-            Return Color.White
+            Return Colors.White
         End Function
 
         ''' <summary>
         ''' Render the entire scene
         ''' EDITOR.BAS:261-268, 968-1044 - Main rendering code
         ''' </summary>
-        Public Sub Render(g As Graphics, width As Integer, height As Integer, Optional highlightIndex As Integer = -1, Optional highlightColor As Integer = 9)
+        Public Sub Render(context As DrawingContext, width As Integer, height As Integer, Optional highlightIndex As Integer = -1, Optional highlightColor As Integer = 9)
             ' EDITOR.BAS:262-265 - Draw horizon line
             ' COLOR 2
             ' horizonheight = -200 * SIN(camerarotx) + 100
@@ -58,9 +59,8 @@ Namespace Editor3D
             ' LINE (0, horizonheight + twist)-(320, horizonheight - twist)
             Dim horizonHeight = Camera.GetHorizonHeight(height)
             Dim twist = Camera.GetHorizonTwist()
-            Using horizonPen As New Pen(Color.DarkGreen, 1)
-                g.DrawLine(horizonPen, 0, horizonHeight + twist, width, horizonHeight - twist)
-            End Using
+            Dim horizonPen As New Pen(New SolidColorBrush(Colors.DarkGreen), 1)
+            context.DrawLine(horizonPen, New Point(0, horizonHeight + twist), New Point(width, horizonHeight - twist))
 
             ' EDITOR.BAS:970-1042 - Render all objects
             ' FOR currentobj = 1 TO 100
@@ -78,9 +78,8 @@ Namespace Editor3D
                     objColor = GetColor(obj.Color)
                 End If
 
-                Using pen As New Pen(objColor, 1.5F)
-                    RenderObject(g, obj, pen, width, height)
-                End Using
+                Dim pen As New Pen(New SolidColorBrush(objColor), 1.5)
+                RenderObject(context, obj, pen, width, height)
             Next
         End Sub
 
@@ -88,7 +87,7 @@ Namespace Editor3D
         ''' Render a single object
         ''' EDITOR.BAS:972-1040 - Inner object rendering loop
         ''' </summary>
-        Private Sub RenderObject(g As Graphics, obj As Object3D, pen As Pen, width As Integer, height As Integer)
+        Private Sub RenderObject(context As DrawingContext, obj As Object3D, pen As Pen, width As Integer, height As Integer)
             ' EDITOR.BAS:972 - FOR part = object(currentobj).beg TO object(currentobj).fin
             For partIndex = obj.PointBegin To obj.PointEnd
                 If partIndex < 0 OrElse partIndex >= World3D.MaxPoints Then Continue For
@@ -148,7 +147,7 @@ Namespace Editor3D
                            pixelX2 >= -width AndAlso pixelX2 <= width * 2 AndAlso
                            pixelY2 >= -height AndAlso pixelY2 <= height * 2 Then
                             ' EDITOR.BAS:1036 - LINE (...), object(currentobj).col
-                            g.DrawLine(pen, pixelX1, pixelY1, pixelX2, pixelY2)
+                            context.DrawLine(pen, New Point(pixelX1, pixelY1), New Point(pixelX2, pixelY2))
                         End If
                     End If
                 Next
