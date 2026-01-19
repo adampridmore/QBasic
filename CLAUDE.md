@@ -5,8 +5,8 @@ This repository contains classic QBasic programs from the DOS era and their mode
 ## Project Structure
 
 - `/` - Original QBasic .BAS files
-- `/SpinHouse/` - VB.Net Windows Forms port of SPINHOUS.BAS
-- `/Editor3D/` - VB.Net Windows Forms port of EDITOR.BAS
+- `/SpinHouse/` - VB.Net Avalonia port of SPINHOUS.BAS (cross-platform)
+- `/Editor3D/` - VB.Net Windows Forms port of EDITOR.BAS (Windows only)
 
 ## Original QBasic Programs
 
@@ -18,9 +18,9 @@ This repository contains classic QBasic programs from the DOS era and their mode
 
 ## VB.Net Projects
 
-### SpinHouse
+### SpinHouse (Cross-platform - Avalonia)
 
-Spinning 3D wireframe house visualization.
+Spinning 3D wireframe house visualization. Uses [Avalonia UI](https://avaloniaui.net/) for cross-platform support (Windows, macOS, Linux).
 
 ```bash
 cd SpinHouse
@@ -75,7 +75,13 @@ dotnet run
 
 When converting QBasic to VB.Net:
 - QBasic arrays are 1-indexed; VB.Net uses 0-indexed by default
-- QBasic `SCREEN` modes map to Windows Forms with GDI+ rendering
+- QBasic `SCREEN` modes map to custom controls with rendering
 - QBasic `INKEY$` maps to KeyDown/KeyUp events
-- Use double-buffering and a Timer for smooth animation
-- QBasic `LINE` command maps to `Graphics.DrawLine()`
+- Use a Timer and `InvalidateVisual()` for smooth animation
+- QBasic `LINE` command maps to `DrawLine()` methods
+
+### Avalonia-specific notes (SpinHouse)
+- Uses `Avalonia.Media` instead of `System.Drawing`
+- Custom `Control` with `Render()` override for drawing
+- `DispatcherTimer` for animation loop
+- `DrawingContext.DrawLine()` for line rendering

@@ -1,4 +1,5 @@
-Imports System.Drawing
+Imports Avalonia
+Imports Avalonia.Media
 
 Namespace SpinHouse
     ''' <summary>
@@ -187,47 +188,47 @@ Namespace SpinHouse
         End Function
 
         ''' <summary>
-        ''' Render the house to the given graphics context
+        ''' Render the house to the given Avalonia drawing context
         ''' SPINHOUS.BAS:185-202 - Main rendering loop
         ''' </summary>
-        Public Sub Render(g As Graphics, width As Integer, height As Integer)
-            Using pen As New Pen(Color.Cyan, 1.5F)
-                ' SPINHOUS.BAS:185 - FOR lop = 1 TO cubesize
-                For i = 0 To Points.Count - 1
-                    Dim pt = Points(i)
-                    ' SPINHOUS.BAS:187-188
-                    Dim x = ScreenPosX(pt.X, pt.Y, pt.Z)
-                    Dim y = ScreenPosY(pt.X, pt.Y, pt.Z)
+        Public Sub Render(context As DrawingContext, width As Double, height As Double)
+            Dim pen As New Pen(Brushes.Cyan, 1.5)
 
-                    ' SPINHOUS.BAS:189 - Skip if out of bounds
-                    If y < -0.5F OrElse x < -0.5F OrElse x > 0.5F OrElse y > 0.5F Then
-                        Continue For
-                    End If
+            ' SPINHOUS.BAS:185 - FOR lop = 1 TO cubesize
+            For i = 0 To Points.Count - 1
+                Dim pt = Points(i)
+                ' SPINHOUS.BAS:187-188
+                Dim x = ScreenPosX(pt.X, pt.Y, pt.Z)
+                Dim y = ScreenPosY(pt.X, pt.Y, pt.Z)
 
-                    ' SPINHOUS.BAS:190-200 - Draw lines to connected points
-                    For Each connIndex In pt.Connections
-                        If connIndex >= 0 AndAlso connIndex < Points.Count Then
-                            Dim pt2 = Points(connIndex)
-                            ' SPINHOUS.BAS:192-193
-                            Dim x1 = ScreenPosX(pt2.X, pt2.Y, pt2.Z)
-                            Dim y1 = ScreenPosY(pt2.X, pt2.Y, pt2.Z)
+                ' SPINHOUS.BAS:189 - Skip if out of bounds
+                If y < -0.5F OrElse x < -0.5F OrElse x > 0.5F OrElse y > 0.5F Then
+                    Continue For
+                End If
 
-                            ' SPINHOUS.BAS:194 - Skip if out of bounds
-                            If x1 < -0.5F OrElse y1 < -0.5F OrElse x1 > 0.5F OrElse y1 > 0.5F Then
-                                Continue For
-                            End If
+                ' SPINHOUS.BAS:190-200 - Draw lines to connected points
+                For Each connIndex In pt.Connections
+                    If connIndex >= 0 AndAlso connIndex < Points.Count Then
+                        Dim pt2 = Points(connIndex)
+                        ' SPINHOUS.BAS:192-193
+                        Dim x1 = ScreenPosX(pt2.X, pt2.Y, pt2.Z)
+                        Dim y1 = ScreenPosY(pt2.X, pt2.Y, pt2.Z)
 
-                            ' SPINHOUS.BAS:195 - LINE statement
-                            Dim screenX1 = CInt((x + 0.5F) * width)
-                            Dim screenY1 = CInt((y + 0.5F) * height)
-                            Dim screenX2 = CInt((x1 + 0.5F) * width)
-                            Dim screenY2 = CInt((y1 + 0.5F) * height)
-
-                            g.DrawLine(pen, screenX1, screenY1, screenX2, screenY2)
+                        ' SPINHOUS.BAS:194 - Skip if out of bounds
+                        If x1 < -0.5F OrElse y1 < -0.5F OrElse x1 > 0.5F OrElse y1 > 0.5F Then
+                            Continue For
                         End If
-                    Next
+
+                        ' SPINHOUS.BAS:195 - LINE statement
+                        Dim screenX1 = (x + 0.5F) * width
+                        Dim screenY1 = (y + 0.5F) * height
+                        Dim screenX2 = (x1 + 0.5F) * width
+                        Dim screenY2 = (y1 + 0.5F) * height
+
+                        context.DrawLine(pen, New Point(screenX1, screenY1), New Point(screenX2, screenY2))
+                    End If
                 Next
-            End Using
+            Next
         End Sub
     End Class
 End Namespace
